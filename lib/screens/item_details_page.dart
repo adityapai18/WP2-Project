@@ -1,9 +1,11 @@
-import 'package:doctor_appointment/constants.dart';
+import 'package:doctor_appointment/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ItemDetailsPage extends StatefulWidget {
+  const ItemDetailsPage({Key? key}) : super(key: key);
+
   @override
   _ItemDetailsPageState createState() => _ItemDetailsPageState();
 }
@@ -110,9 +112,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      child: SvgPicture.asset("assets/ic_call.svg"),
-                    ),
+                    SvgPicture.asset("assets/ic_call.svg"),
                     Container(
                       margin: const EdgeInsets.only(left: 5),
                       child: SvgPicture.asset(
@@ -144,9 +144,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
             margin: const EdgeInsets.only(left: 20, top: 15),
             child: Row(
               children: [
-                Container(
-                  child: SvgPicture.asset("assets/ic_loc.svg"),
-                ),
+                SvgPicture.asset("assets/ic_loc.svg"),
                 Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
@@ -193,44 +191,40 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    margin: EdgeInsets.only(right: 10),
+                    margin: const EdgeInsets.only(right: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          child: Text(
-                            "Reviews",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: GoogleFonts.mulish().fontFamily,
-                              color: Colors.black,
-                            ),
+                        Text(
+                          "Reviews",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: GoogleFonts.mulish().fontFamily,
+                            color: Colors.black,
                           ),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 10),
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/ic_rating.svg",
-                                  height: 16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/ic_rating.svg",
+                                height: 16,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  "4.9",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily:
+                                          GoogleFonts.mulish().fontFamily,
+                                      color: Colors.black),
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    "4.9",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily:
-                                            GoogleFonts.mulish().fontFamily,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         )
                       ],
@@ -250,39 +244,35 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          child: Text(
-                            "Patients",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: GoogleFonts.mulish().fontFamily,
-                              color: Colors.black,
-                            ),
+                        Text(
+                          "Patients",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: GoogleFonts.mulish().fontFamily,
+                            color: Colors.black,
                           ),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 10),
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/ic_patients.svg",
-                                  height: 16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/ic_patients.svg",
+                                height: 16,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  "22k",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily:
+                                          GoogleFonts.mulish().fontFamily,
+                                      color: Colors.black),
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    "22k",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily:
-                                            GoogleFonts.mulish().fontFamily,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         )
                       ],

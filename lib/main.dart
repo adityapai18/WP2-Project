@@ -1,18 +1,23 @@
+import 'package:doctor_appointment/navigation/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'home_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      theme: ThemeData(
+        textTheme: GoogleFonts.readexProTextTheme(
+          Theme.of(context).textTheme,
+        ),
+      ),
+      home: const Index(),
     );
   }
 }

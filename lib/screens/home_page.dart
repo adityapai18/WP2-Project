@@ -1,17 +1,29 @@
-import 'package:doctor_appointment/item_details_page.dart';
+import 'package:doctor_appointment/screens/item_details_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'constants.dart';
+import '../constants/constants.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  String selectedCategories = 'Surgeon';
+  void setSelectedCat(String s) {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      selectedCategories = s;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,7 +150,7 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             flex: 1,
             child: Container(
-              margin: EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10),
               padding: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -192,10 +204,14 @@ class _HomePageState extends State<HomePage> {
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             children: [
-              categoryTile("Surgeon", "assets/ic_surgeon.png", true),
-              categoryTile("Urologist", "assets/ic_kidney.png", false),
-              categoryTile("Dentist", "assets/ic_dentist.png", false),
-              categoryTile("Allergist", "assets/ic_allergy.png", false),
+              categoryTile("Surgeon", "assets/ic_surgeon.png",
+                  selectedCategories == 'Surgeon'),
+              categoryTile("Urologist", "assets/ic_kidney.png",
+                  selectedCategories == 'Urologist'),
+              categoryTile("Dentist", "assets/ic_dentist.png",
+                  selectedCategories == 'Dentist'),
+              categoryTile("Allergist", "assets/ic_allergy.png",
+                  selectedCategories == 'Allergist'),
             ],
           ),
         )
@@ -205,57 +221,60 @@ class _HomePageState extends State<HomePage> {
 
   Widget categoryTile(String title, String img, bool isSelected) {
     return Container(
-      width: 100,
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isSelected ? Constants.PRIMARY_COLOR : const Color(0xffE3E3E3),
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-            img,
-            height: 50,
-            width: 50,
-            color: isSelected ? Constants.PRIMARY_COLOR : Colors.black,
+        width: 100,
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color:
+                isSelected ? Constants.PRIMARY_COLOR : const Color(0xffE3E3E3),
           ),
-          Container(
-            margin: const EdgeInsets.only(top: 10),
-            child: Text(
-              title,
-              style: TextStyle(
-                  fontSize: 16.5,
-                  fontFamily: GoogleFonts.mulish().fontFamily,
-                  color: isSelected ? Constants.PRIMARY_COLOR : Colors.black),
-            ),
-          )
-        ],
-      ),
-    );
+        ),
+        child: InkWell(
+          // ignore: avoid_print
+          onTap: (() => {setSelectedCat(title)}),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                img,
+                height: 50,
+                width: 50,
+                color: isSelected ? Constants.PRIMARY_COLOR : Colors.black,
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                      fontSize: 16.5,
+                      fontFamily: GoogleFonts.mulish().fontFamily,
+                      color:
+                          isSelected ? Constants.PRIMARY_COLOR : Colors.black),
+                ),
+              )
+            ],
+          ),
+        ));
   }
 
   Widget buildDoctorsList() {
-    return Container(
-      child: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        children: [
-          doctorListTile("assets/dr_1.png", "Dr. Smith", "Surgeon", "4.7",
-              "10.00 AM - 03.00 AM", false),
-          doctorListTile("assets/dr_2.png", "Dr. Steve Son", "Urologist", "4.5",
-              "10.00 AM - 03.00 AM", false),
-          doctorListTile("assets/dr_3.png", "Dr. Banner", "Dentists", "5.0",
-              "10.00 AM - 03.00 AM", false),
-          doctorListTile("assets/dr_4.png", "Dr. Clart Jon", "Surgeon", "4.1",
-              "10.00 AM - 03.00 AM", false),
-        ],
-      ),
+    return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      children: [
+        doctorListTile("assets/dr_1.png", "Dr. Smith", "Surgeon", "4.7",
+            "10.00 AM - 03.00 AM", false),
+        doctorListTile("assets/dr_2.png", "Dr. Steve Son", "Urologist", "4.5",
+            "10.00 AM - 03.00 AM", false),
+        doctorListTile("assets/dr_3.png", "Dr. Banner", "Dentists", "5.0",
+            "10.00 AM - 03.00 AM", false),
+        doctorListTile("assets/dr_4.png", "Dr. Clart Jon", "Surgeon", "4.1",
+            "10.00 AM - 03.00 AM", false),
+      ],
     );
   }
 
