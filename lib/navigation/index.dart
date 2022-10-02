@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:doctor_appointment/context/auth_con.dart';
 import 'package:doctor_appointment/navigation/auth_stack.dart';
 import 'package:doctor_appointment/navigation/user_stack.dart';

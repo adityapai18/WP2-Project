@@ -14,6 +14,11 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final pwdController = TextEditingController();
+  final cpwdController = TextEditingController();
+  final fnameController = TextEditingController();
+  final lnameController = TextEditingController();
   bool checkBox = false;
   @override
   Widget build(BuildContext context) {
@@ -74,31 +79,31 @@ class _SignUpState extends State<SignUp> {
                 return 'Please enter some text';
               }
               return null;
-            }, 'First Name'),
+            }, 'First Name', fnameController),
             customInput((text) {
               if (text == null || text.isEmpty) {
                 return 'Please enter some text';
               }
               return null;
-            }, 'Last Name'),
+            }, 'Last Name', lnameController),
             customInput((text) {
               if (text == null || text.isEmpty) {
                 return 'Please enter some text';
               }
               return null;
-            }, 'Email'),
+            }, 'Email', emailController),
             customInput((text) {
               if (text == null || text.isEmpty) {
                 return 'Please enter some text';
               }
               return null;
-            }, 'Password'),
+            }, 'Password', pwdController),
             customInput((text) {
               if (text == null || text.isEmpty) {
                 return 'Please enter some text';
               }
               return null;
-            }, 'Confirm Password'),
+            }, 'Confirm Password', cpwdController),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
@@ -141,7 +146,13 @@ class _SignUpState extends State<SignUp> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Processing Data')),
                     );
-                    context.read<AuthContext>().setAuthorized();
+                    context.read<AuthContext>().signUpEmailAndPass(
+                        fnameController.text,
+                        lnameController.text,
+                        emailController.text,
+                        pwdController.text,
+                        cpwdController.text,
+                        context);
                   }
                 },
                 child: const Text('SIGN UP'),
@@ -162,10 +173,10 @@ class _SignUpState extends State<SignUp> {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => const Login()));
+                            MaterialPageRoute(builder: (_) => const Login()),
+                            (route) => false);
                       },
                       child: const Text(
                         'Login',
@@ -180,7 +191,8 @@ class _SignUpState extends State<SignUp> {
         ));
   }
 
-  Widget customInput(String? Function(String?)? validation, String label) {
+  Widget customInput(String? Function(String?)? validation, String label,
+      TextEditingController cntrl) {
     return Padding(
       padding: const EdgeInsets.only(top: 15, bottom: 15, right: 10, left: 10),
       child: Container(
@@ -192,6 +204,7 @@ class _SignUpState extends State<SignUp> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: TextFormField(
             validator: validation,
+            controller: cntrl,
             obscureText: label == 'Password' || label == 'Confirm Password',
             enableSuggestions:
                 label != 'Password' || label == 'Confirm Password',
