@@ -21,8 +21,9 @@ class _IndexState extends State<Index> {
 
   @override
   Widget build(BuildContext context) {
-    return context.watch<AuthContext>().authState
-        ? const UserStack()
-        : const AuthStack();
+    // return context.watch<AuthContext>().authState
+    //     ? const UserStack()
+    //     : const AuthStack();
+    return const UserStack();
   }
 }

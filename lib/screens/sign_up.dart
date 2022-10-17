@@ -200,7 +200,7 @@ class _SignUpState extends State<SignUp> {
           color: Constants.GRAY,
           borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Padding(
+        child: Padding(''
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: TextFormField(
             validator: validation,

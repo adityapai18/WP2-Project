@@ -2,8 +2,10 @@ import 'package:doctor_appointment/screens/item_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/constants.dart';
+import '../context/auth_con.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -52,20 +54,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget profileWid() {
+    if (context.watch<AuthContext>().user.photoUrl != '') {
+      return const CircleAvatar(
+        backgroundImage: AssetImage(
+          "assets/dr_1.png",
+        ),
+      );
+    }
+    return InkWell(
+      onTap: (() => {}),
+      child: const Icon(
+        Icons.account_circle,
+        size: 50,
+        color: Colors.grey,
+      ),
+    );
+  }
+
   Widget buildAppBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 50,
-          height: 50,
-          margin: const EdgeInsets.only(left: 20),
-          child: const CircleAvatar(
-              backgroundImage: AssetImage(
-            "assets/dr_1.png",
-          )),
-        ),
+            width: 50,
+            height: 50,
+            margin: const EdgeInsets.only(left: 20),
+            child: InkWell(child: profileWid())),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -313,15 +329,13 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    child: Text(
-                      name,
-                      style: TextStyle(
-                          fontSize: 16.5,
-                          fontFamily: GoogleFonts.mulish().fontFamily,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : Colors.black),
-                    ),
+                  Text(
+                    name,
+                    style: TextStyle(
+                        fontSize: 16.5,
+                        fontFamily: GoogleFonts.mulish().fontFamily,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? Colors.white : Colors.black),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 2),
