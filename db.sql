@@ -1,0 +1,10 @@
+CREATE DATABASE mydoc_db;
+USE mydoc_db;
+CREATE TABLE  users (
+  UID int(10) unsigned NOT NULL AUTO_INCREMENT,
+  NAME varchar(45) NOT NULL DEFAULT '',
+  EMAIL varchar(45) NOT NULL DEFAULT '',
+  UPASS varchar(65) NOT NULL DEFAULT '',
+  'img_url' varchar(55) NOT NULL DEFAULT '',
+  PRIMARY KEY (UID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
