@@ -103,7 +103,7 @@ class _LoginState extends State<Login> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.only(top: 40),
+            margin: const EdgeInsets.only(top: 40, bottom: 20),
             child: Center(
               child: Wrap(
                 alignment: WrapAlignment.center,

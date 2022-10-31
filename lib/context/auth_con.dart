@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:doctor_appointment/helpers/storage.dart';
 import 'package:doctor_appointment/navigation/user_stack.dart';
-import 'package:doctor_appointment/screens/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -51,7 +51,8 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> signUpEmailAndPass(String fname, String lname, String email,
       String pass, String cpass, BuildContext context) async {
-    Uri url = Uri.http('localhost', '/wp/api/users/signup.php');
+    print('nigga');
+    Uri url = Uri.http('192.168.1.6', '/wp/api/users/signup.php');
     var data = {
       'name': fname + ' ' + lname,
       'password': hashPassword(pass),
@@ -63,12 +64,16 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
       if (msg['message'] == 'success') {
         // print('reco');
         // setAuthorized();
-        Navigator.pushAndRemoveUntil(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return const Login();
-        }), (r) {
-          return false;
-        });
+        // Navigator.pushAndRemoveUntil(context,
+        //     MaterialPageRoute(builder: (BuildContext context) {
+        //   return const Login();
+        // }), (r) {
+        //   return false;
+        // });
+        print(msg);
+        var store = Storage(msg['enc_key']);
+        store.putKey();
+        store.readKey();
       } else {
         AlertDialog(
           title: const Text('AlertDialog Title'),
@@ -90,7 +95,7 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> loginWithEmailAndPassword(
       String email, String pass, BuildContext cntx) async {
-    Uri url = Uri.http('localhost', '/wp/api/users/login.php');
+    Uri url = Uri.http('192.168.1.6', '/wp/api/users/login.php');
     var data = {'password': hashPassword(pass), 'email': email};
 
     var response = await http.post(url, body: json.encode(data));
