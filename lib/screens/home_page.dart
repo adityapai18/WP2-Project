@@ -15,6 +15,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedCategories = 'Surgeon';
+  // String userName = '';
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   setState(() {
+  //     userName = context.read<AuthContext>
+  //   });
+  // }
+
   void setSelectedCat(String s) {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -31,13 +40,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: initWidget(),
+          child: initWidget(context),
         ),
       ),
     );
   }
 
-  Widget initWidget() {
+  Widget initWidget(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +55,7 @@ class _HomePageState extends State<HomePage> {
           child: buildAppBar(),
           margin: const EdgeInsets.only(top: 15),
         ),
-        buildGreetings(),
+        buildGreetings(context),
         buildSearch(),
         buildCategories(),
         buildDoctorsList()
@@ -95,7 +104,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildGreetings() {
+  Widget buildGreetings(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 20, top: 30),
       child: Column(
@@ -103,7 +112,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Welcome To",
+            "Welcome " + context.read<AuthContext>().user.name.split(" ")[0],
             style: TextStyle(
                 fontFamily: GoogleFonts.mulish().fontFamily, fontSize: 22),
           ),
