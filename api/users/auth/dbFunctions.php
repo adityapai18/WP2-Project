@@ -35,6 +35,19 @@ function getUserData(\PDO $dbh, string $uid)
     }
     return false;
 }
+function getUserDataFromEmail(\PDO $dbh, string $email)
+{
+    $sql = "SELECT * FROM user_data WHERE EMAIL = :id ;";
+    $stmt =  $dbh->prepare($sql);
+    $stmt->bindParam(':id', $email);
+    $stmt->execute();
+    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+    $res = $stmt->fetchAll();
+    if (isset($res) && isset($res[0]) && count($res) == 1) {
+        return $res[0];
+    }
+    return false;
+}
 function getDecryptedAuthKeyFromEmail(\PDO $dbh, string $email)
 {
     require_once "./auth_helper.php";

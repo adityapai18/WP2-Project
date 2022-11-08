@@ -42,7 +42,7 @@ function decrypt_key_in_db(string $ivHashCiphertext, string $key)
     $iv = substr($ivHashCiphertext, 0, 32);
     $hash = substr($ivHashCiphertext, 32, 64);
     $ciphertext = substr($ivHashCiphertext, 96);
-    // print_r($ciphertext. $iv . '\n');
+    // print_r($ciphertext.$iv );
     if (!hash_equals(hash_hmac('sha256', hex2bin($ciphertext . $iv) , $key), $hash)) return null;
 
     return openssl_decrypt(hex2bin($ciphertext), $method, $key, OPENSSL_RAW_DATA, hex2bin($iv));

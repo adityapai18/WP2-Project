@@ -36,11 +36,12 @@ if (isset($obj["email"]) && isset($obj["password"]) && isset($obj["name"])) {
         $genKey = generateRandomKey();
         $key = getAuthKey($genKey);
         $hexKey = bin2hex($key);
+        $dbKeyArr=json_encode($hexKey);
         $insert = "INSERT INTO users(EMAIL,UPASS,AUTH_KEY) VALUES( :email , :pwd , :key )";
         $stmt =  $dbh->prepare($insert);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':pwd', $pwd);
-        $stmt->bindParam(':key', $hexKey);
+        $stmt->bindParam(':key', $dbKeyArr);
         $status = $stmt->execute();
 
         if ($status) {
