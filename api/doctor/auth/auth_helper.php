@@ -31,8 +31,7 @@ function decrypt_message(string $ivHashCiphertext, string $key)
     $hash = substr($ivHashCiphertext, 32, 64);
     $ciphertext = substr($ivHashCiphertext, 96);
     // print_r(bin2hex($ciphertext. $iv));
-    if (!hash_equals(hash_hmac('sha256', hex2bin($iv . $ciphertext) , $key), $hash)) return null;
-
+    // if (!hash_equals(hash_hmac('sha256', hex2bin($iv . $ciphertext) , $key), $hash)) return null;
     return openssl_decrypt(hex2bin($ciphertext), $method, $key, OPENSSL_RAW_DATA, hex2bin($iv));
     // return strlen($ciphertext);
 }
