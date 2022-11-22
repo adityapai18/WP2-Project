@@ -20,6 +20,72 @@
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <?php session_start(); ?>
+<?php
+function getDayBookingsByEmail(string $email, string $datePicked)
+{
+	include '../../../api/users/auth/dbConfig.php';
+	try {
+		$dbh = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	} catch (\PDOException $err) {
+		die("Couldn't connect to DB " . $err->getMessage());
+	}
+	$sql = "SELECT BOOKING FROM doc_data WHERE EMAIL=:id;";
+	$stmt =  $dbh->prepare($sql);
+	$stmt->bindParam(':id', $email);
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetch();
+	$bookings = json_decode($res['BOOKING'], true);
+	if (isset($bookings[$datePicked])) {
+		return $bookings[$datePicked];
+	}
+	return false;
+}
+function getAppointmentDetails(string $uid)
+{
+	include '../../../api/users/auth/dbConfig.php';
+	try {
+		$dbh = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	} catch (\PDOException $err) {
+		die("Couldn't connect to DB " . $err->getMessage());
+	}
+	$sql = "SELECT * FROM booking WHERE doc_id=:id";
+	$stmt =  $dbh->prepare($sql);
+	$stmt->bindParam(':id', $uid);
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetchAll();
+	// $res['user_data'] = getUserDetails($res['user_id'], $dbh);
+	foreach ($res as $key => $value) {
+		$res[$key]['user_data'] = getUserDetails($res[$key]['user_id'], $dbh);
+	}
+	return $res;
+}
+function getUserDetails(string $uid, \PDO $dbh)
+{
+	$sql = "SELECT NAME , EMAIL FROM user_data WHERE UID = :id ;";
+	$stmt =  $dbh->prepare($sql);
+	$stmt->bindParam(':id', $uid);
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetchAll();
+	return $res[0];
+}
+function isFuture($date)
+{
+	$current = strtotime(date("Y-m-d"));
+	$date    = strtotime("2014-09-05");
+	$res = false;
+	$datediff = $date - $current;
+	$difference = floor($datediff / (60 * 60 * 24));
+	if ($difference > 1) {
+		return true;
+	} 
+	return $res;
+}
+?>
 
 <body>
 	<div class="wrapper">
@@ -295,6 +361,9 @@
 								<div class="card-body py-3">
 									<div class="chart chart-sm">
 										<canvas id="chartjs-dashboard-line"></canvas>
+										<form action="./index.php" method="post" id="dateForm">
+											<input type="hidden" name="datePicked" id="dateInput">
+										</form>
 									</div>
 								</div>
 							</div>
@@ -305,35 +374,73 @@
 						<div class="col-12 col-md-6 col-xxl-3 d-flex order-2 order-xxl-3">
 							<div class="card flex-fill w-100">
 								<div class="card-header">
-
-									<h5 class="card-title mb-0">Browser Usage</h5>
+									<h5 class="card-title mb-0">Slot Details</h5>
 								</div>
-								<div class="card-body d-flex">
-									<div class="align-self-center w-100">
-										<div class="py-3">
-											<div class="chart chart-xs">
-												<canvas id="chartjs-dashboard-pie"></canvas>
+								<?php
+								if (isset($_POST['datePicked'])) $date = $_POST['datePicked'];
+								$doc_email = $_SESSION['user_data']['EMAIL'];
+								if (isset($date) && isset($doc_email)) {
+									$result = getDayBookingsByEmail($doc_email, $date);
+									if ($result === false) {
+								?>
+										<div class="card-body d-flex">
+											<div class="align-self-center w-100">
+												<h1 class="text-warning text-center">Schedule not set for the day !</h1>
+												<form action="../../../api/doctor/init_schedule.php" method="post" class="d-flex row align-items-center justify-content-center">
+													<div class="d-flex gap-5 p-3 align-items-center justify-content-center">
+														<div>
+															<label for="start">Start Time :</label>
+															<input type="number" name="startTime" id="start" class="form-control" min="1" max="24">
+														</div>
+														<div>
+															<label for="end">End Time :</label>
+															<input type="number" name="endTime" id="end" class="form-control" min="1" max="24">
+														</div>
+													</div>
+													<input type="hidden" name="email" value="<?php echo $doc_email ?>">
+													<input type="hidden" name="date" value="<?php echo $date ?>">
+													<input type="submit" class="btn btn-primary w-50"></input>
+												</form>
 											</div>
 										</div>
-
-										<table class="table mb-0">
-											<tbody>
-												<tr>
-													<td>Chrome</td>
-													<td class="text-end">4306</td>
-												</tr>
-												<tr>
-													<td>Firefox</td>
-													<td class="text-end">3801</td>
-												</tr>
-												<tr>
-													<td>IE</td>
-													<td class="text-end">1689</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
+									<?php
+									} else {
+									?>
+										<div class="card-body d-flex">
+											<div class="align-self-center w-100">
+												<table class="table mb-0">
+													<thead>
+														<tr>
+															<th>Slot</th>
+															<th class="text-end">Status</th>
+														</tr>
+													</thead>
+													<tbody>
+														<?php
+														foreach ($result as $key => $value) {
+														?>
+															<tr>
+																<td><?php echo $key . ':00 - ' . intval($key) + 1 . ":00" ?></td>
+																<td class="text-end">
+																	<?php
+																	if ($value === false) {
+																		echo "<span class='badge bg-warning'>vacant</span>";
+																	} else {
+																		echo "<span class='badge bg-success'>booked</span>";
+																	}
+																	?></td>
+															</tr>
+														<?php
+														}
+														?>
+													</tbody>
+												</table>
+											</div>
+										</div>
+								<?php
+									}
+								}
+								?>
 							</div>
 						</div>
 						<div class="col-12 col-md-6 col-xxl-3 d-flex order-1 order-xxl-1">
@@ -358,75 +465,35 @@
 							<div class="card flex-fill">
 								<div class="card-header">
 
-									<h5 class="card-title mb-0">Latest Projects</h5>
+									<h5 class="card-title mb-0">Appointment Details</h5>
 								</div>
 								<table class="table table-hover my-0">
 									<thead>
 										<tr>
-											<th>Name</th>
-											<th class="d-none d-xl-table-cell">Start Date</th>
-											<th class="d-none d-xl-table-cell">End Date</th>
-											<th>Status</th>
-											<th class="d-none d-md-table-cell">Assignee</th>
+											<th>Patient Name</th>
+											<th class="d-none d-md-table-cell">Email</th>
+											<th>Appointment Date</th>
+											<th>Slot</th>
+											<th class="d-none d-xl-table-cell">Status</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
-											<td>Project Apollo</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-success">Done</span></td>
-											<td class="d-none d-md-table-cell">Vanessa Tucker</td>
-										</tr>
-										<tr>
-											<td>Project Fireball</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-danger">Cancelled</span></td>
-											<td class="d-none d-md-table-cell">William Harris</td>
-										</tr>
-										<tr>
-											<td>Project Hades</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-success">Done</span></td>
-											<td class="d-none d-md-table-cell">Sharon Lessman</td>
-										</tr>
-										<tr>
-											<td>Project Nitro</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-warning">In progress</span></td>
-											<td class="d-none d-md-table-cell">Vanessa Tucker</td>
-										</tr>
-										<tr>
-											<td>Project Phoenix</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-success">Done</span></td>
-											<td class="d-none d-md-table-cell">William Harris</td>
-										</tr>
-										<tr>
-											<td>Project X</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-success">Done</span></td>
-											<td class="d-none d-md-table-cell">Sharon Lessman</td>
-										</tr>
-										<tr>
-											<td>Project Romeo</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-success">Done</span></td>
-											<td class="d-none d-md-table-cell">Christina Mason</td>
-										</tr>
-										<tr>
-											<td>Project Wombat</td>
-											<td class="d-none d-xl-table-cell">01/01/2021</td>
-											<td class="d-none d-xl-table-cell">31/06/2021</td>
-											<td><span class="badge bg-warning">In progress</span></td>
-											<td class="d-none d-md-table-cell">William Harris</td>
-										</tr>
+										<?php
+										if (isset($_SESSION['user_data'])) {
+											$appArray = getAppointmentDetails($_SESSION['user_data']["UID"]);
+											foreach ($appArray as $key => $value) {
+										?>
+												<tr>
+													<td><?php echo $value['user_data']['NAME'] ?></td>
+													<td class="d-none d-xl-table-cell"><?php echo $value['user_data']['EMAIL'] ?></td>
+													<td class="d-none d-xl-table-cell"><?php echo $value['apt_date'] ?></td>
+													<td class="d-none d-md-table-cell"><?php echo $value['apt_time'] . ":00 - " . intval($value['apt_time']) + 1 . ":00"  ?></td>
+													<?php echo isFuture($value['apt_date']) ?  '<td><span class="badge bg-success">Completed</span></td>':'<td><span class="badge bg-warning">Upcoming</span></td>' ?>
+												</tr>
+										<?php
+											}
+										}
+										?>
 									</tbody>
 								</table>
 							</div>
@@ -585,16 +652,20 @@
 	</script>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
-			var date = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+			var date = new Date();
 			var defaultDate = date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
+			console.log(defaultDate)
 			document.getElementById("datetimepicker-dashboard").flatpickr({
 				inline: true,
 				prevArrow: "<span title=\"Previous month\">&laquo;</span>",
 				nextArrow: "<span title=\"Next month\">&raquo;</span>",
-				defaultDate: defaultDate,
+				defaultDate: <?php if (isset($_POST['datePicked'])) echo json_encode($_POST['datePicked']);
+								else echo json_encode('2022-11-24') ?>,
 				onChange: function(selectedDates, dateStr, instance) {
-					console.log(dateStr)
-				}
+					document.getElementById('dateInput').value = dateStr;
+					document.getElementById('dateForm').submit();
+				},
+				minDate: date.toISOString()
 			});
 		});
 	</script>

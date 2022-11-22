@@ -1,7 +1,8 @@
 <?php 
 include '../users/auth/dbConfig.php';
 
-$uid = $_GET['uid'];
+$uid = $_POST['uid'];
+$pickedDate = $_POST['date'];
 
 try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
@@ -12,13 +13,13 @@ try {
 
 $result = [];
 
-if(isset($uid)){
+if(isset($uid) && isset($pickedDate)){
     $bookingArr = getBookingArray($dbh,$uid);
     $availArr = [];
     // print_r($bookingArr);
     foreach ($bookingArr as $date => $value) {
         $availTimeArr=array();
-        if(strtotime($date) > time()){
+        if(strtotime($date) > time() && $date===$pickedDate){
             foreach ($value as $slot => $booked) {
                 if(!$booked){
                     array_push($availTimeArr,$slot);
@@ -27,7 +28,7 @@ if(isset($uid)){
             $availArr[$date]= $availTimeArr;
         }
     }
-    $result['available'] = $availArr;
+    $result = $availArr;
 }
 else{
     $result['message'] = "error";
