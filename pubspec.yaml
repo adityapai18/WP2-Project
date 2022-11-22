@@ -43,6 +43,7 @@ dependencies:
   encrypt: ^5.0.1
   image_picker: ^0.8.6
   file_picker: ^5.2.2
+  syncfusion_flutter_datepicker: ^20.3.58
 
 dev_dependencies:
   flutter_test:

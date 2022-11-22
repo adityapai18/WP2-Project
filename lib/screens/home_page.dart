@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doctor_appointment/screens/item_details_page.dart';
 import 'package:doctor_appointment/screens/profile.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../constants/constants.dart';
 import '../context/auth_con.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,14 +19,28 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedCategories = 'Surgeon';
+  var docArray = [];
   // String userName = '';
   // @override
-  // void initState() {
-  //   super.initState();
-  //   setState(() {
-  //     userName = context.read<AuthContext>
-  //   });
-  // }
+  void getDocArray() async {
+    Uri url = Uri.http('192.168.1.3', 'wp/api/users/get_doctors.php');
+    var response = await http.get(url);
+    var msg = json.decode(response.body);
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      docArray = msg;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDocArray();
+  }
 
   void setSelectedCat(String s) {
     setState(() {
@@ -297,29 +314,50 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildDoctorsList() {
+    List<Widget> list = [];
+    for (var doc in docArray) {
+      print(doc);
+      list.add(doctorListTile(
+          "assets/dr_1.png",
+          doc['NAME'],
+          doc['SPECIALITY'],
+          "4.7",
+          "10.00 AM - 03.00 AM",
+          false,
+          doc['DESCRIPTION'],
+          doc['LOCATION'],
+          doc['UID'].toString()));
+    }
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      children: [
-        doctorListTile("assets/dr_1.png", "Dr. Smith", "Surgeon", "4.7",
-            "10.00 AM - 03.00 AM", false),
-        doctorListTile("assets/dr_2.png", "Dr. Steve Son", "Urologist", "4.5",
-            "10.00 AM - 03.00 AM", false),
-        doctorListTile("assets/dr_3.png", "Dr. Banner", "Dentists", "5.0",
-            "10.00 AM - 03.00 AM", false),
-        doctorListTile("assets/dr_4.png", "Dr. Clart Jon", "Surgeon", "4.1",
-            "10.00 AM - 03.00 AM", false),
-      ],
+      children: list,
     );
   }
 
-  Widget doctorListTile(String img, String name, String specialist,
-      String rating, String time, bool isSelected) {
+  Widget doctorListTile(
+      String img,
+      String name,
+      String specialist,
+      String rating,
+      String time,
+      bool isSelected,
+      String des,
+      String loc,
+      String id) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ItemDetailsPage()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ItemDetailsPage(
+                      location: loc,
+                      speciality: specialist,
+                      desc: des,
+                      name: name,
+                      doc_id: id,
+                    )));
       },
       child: Container(
         margin: const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 10),

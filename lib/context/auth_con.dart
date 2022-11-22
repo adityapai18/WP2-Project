@@ -16,11 +16,18 @@ class User {
   String _name = '';
   String _email = '';
   String _photoUrl = '';
+  String _uid = '';
 
   String get name => _name;
 
   set setName(String name) {
     _name = name;
+  }
+
+  String get uid => _name;
+
+  set setUid(String uid) {
+    _uid = uid;
   }
 
   String get getEmail => _email;
@@ -56,6 +63,7 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
     user.setName = userData["NAME"];
     user.setEmail = userData["EMAIL"];
     user.setphotoUrl = userData["IMG_URL"];
+    user.setUid = userData["UID"].toString();
     notifyListeners();
   }
 

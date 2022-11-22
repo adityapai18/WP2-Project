@@ -3,8 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'booking.dart';
+
 class ItemDetailsPage extends StatefulWidget {
-  const ItemDetailsPage({Key? key}) : super(key: key);
+  final String location;
+  final String speciality;
+  final String desc;
+  final String name;
+  final String doc_id;
+  get loc => location;
+  const ItemDetailsPage(
+      {Key? key,
+      required this.location,
+      required this.speciality,
+      required this.desc,
+      required this.name,
+      required this.doc_id})
+      : super(key: key);
 
   @override
   _ItemDetailsPageState createState() => _ItemDetailsPageState();
@@ -99,7 +114,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               Container(
                 margin: const EdgeInsets.only(left: 20, top: 20),
                 child: Text(
-                  "My Doctor",
+                  widget.name,
                   style: TextStyle(
                       fontFamily: GoogleFonts.mulish().fontFamily,
                       fontSize: 28,
@@ -133,7 +148,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
           Container(
             margin: const EdgeInsets.only(left: 20),
             child: Text(
-              "Surgeon, MBBS",
+              widget.speciality,
               style: TextStyle(
                   fontSize: 16.5,
                   fontFamily: GoogleFonts.mulish().fontFamily,
@@ -148,7 +163,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                 Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
-                    "New York, USA",
+                    widget.loc,
                     style: TextStyle(
                         fontSize: 16.5,
                         fontFamily: GoogleFonts.mulish().fontFamily,
@@ -173,7 +188,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
           Container(
             margin: const EdgeInsets.only(left: 20, top: 8, right: 20),
             child: Text(
-              "Dr. Smith is one of the best doctor in New York and has 10 years of experience.He has done more than 100 surgeries",
+              widget.desc,
               style: TextStyle(
                 fontSize: 16,
                 fontFamily: GoogleFonts.mulish().fontFamily,
@@ -287,21 +302,29 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               ],
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(top: 35, left: 20, right: 20),
-            height: 55,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Constants.PRIMARY_COLOR,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              "Book an Appointment",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+          InkWell(
+            onTap: (() {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Booking(doc_id: widget.doc_id)));
+            }),
+            child: Container(
+              margin: const EdgeInsets.only(top: 35, left: 20, right: 20),
+              height: 55,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Constants.PRIMARY_COLOR,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "Book an Appointment",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
