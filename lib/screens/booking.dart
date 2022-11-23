@@ -1,9 +1,13 @@
 import 'dart:convert';
 
 import 'package:doctor_appointment/constants/constants.dart';
+import 'package:doctor_appointment/screens/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:http/http.dart' as http;
+
+import '../context/auth_con.dart';
 
 class Booking extends StatefulWidget {
   final String doc_id;
@@ -106,6 +110,42 @@ class _BookingState extends State<Booking> {
     );
   }
 
+  void bookAppointment() async {
+    var user_id = context.read<AuthContext>().user.uid;
+    var data = {
+      "doc_id": widget.doc_id,
+      "bk_time": timeSelected.toString(),
+      "bk_date": dateSelected,
+      "user_id": user_id
+    };
+    Uri url = Uri.http('192.168.1.3', '/wp/api/users/book_appointment.php');
+    var response = await http.post(url, body: data);
+    var msg = json.decode(response.body);
+    if (msg['booking_status']) {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Booking Successful'),
+          content: Text(
+              'Date : ' + dateSelected + " Time : " + timeSelected.toString()),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => {
+                Navigator.pushAndRemoveUntil(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const HomePage();
+                }), (r) {
+                  return false;
+                })
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Widget button() {
     if (timeList.length == 0) return Container();
     return Container(
@@ -114,7 +154,9 @@ class _BookingState extends State<Booking> {
           width: 150, // <-- Your width
           height: 40, // <-- Your height
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              bookAppointment();
+            },
             child: Text('Submit'),
           )),
     );

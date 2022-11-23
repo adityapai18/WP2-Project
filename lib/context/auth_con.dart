@@ -24,7 +24,7 @@ class User {
     _name = name;
   }
 
-  String get uid => _name;
+  String get uid => _uid;
 
   set setUid(String uid) {
     _uid = uid;
