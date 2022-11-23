@@ -7,10 +7,10 @@ try {
     die("Couldn't connect to DB " . $err->getMessage());
 }
 $result = [];
-$doc_id = $_GET['doc_id'];
-$user_id = $_GET['user_id'];
-$bk_date = $_GET['bk_date'];
-$bk_time = $_GET['bk_time'];
+$doc_id = $_POST['doc_id'];
+$user_id = $_POST['user_id'];
+$bk_date = $_POST['bk_date'];
+$bk_time = $_POST['bk_time'];
 
 if (isset($doc_id) && isset($bk_date) && isset($bk_time)) {
     $bookingArr = getBookingArray($dbh, $doc_id);
