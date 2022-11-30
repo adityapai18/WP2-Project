@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "449165816010",
+    "project_id": "flutter-project-96234",
+    "storage_bucket": "flutter-project-96234.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449165816010:android:e69959b7845a9372c50433",
+        "android_client_info": {
+          "package_name": "com.example.doctor_appointment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449165816010-mnmq43hhg8nbukuvnng9h84kjgfpr02h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwoqO6xuxcM8Y1vk2U42eYvpy9yfSn3xM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449165816010-mnmq43hhg8nbukuvnng9h84kjgfpr02h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

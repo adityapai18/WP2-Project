@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>449165816010-3g6svmepba6ar89t43ddjr4trsc7fh64.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.449165816010-3g6svmepba6ar89t43ddjr4trsc7fh64</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBULScHFid89YpjKfHgWbbTrpt1GnIM-TI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>449165816010</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.doctorAppointment</string>
+	<key>PROJECT_ID</key>
+	<string>flutter-project-96234</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flutter-project-96234.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:449165816010:ios:ee542feda13f18b5c50433</string>
+</dict>
+</plist>

@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -54,26 +54,35 @@ class _ProfileState extends State<Profile> {
   }
 
   void uploadImage() async {
-    List<int> imageBytes = await uploadimage!.readAsBytes();
-    String baseimage = base64Encode(imageBytes);
-    Uri url = Uri.http('192.168.1.3', '/wp/api/users/upload_image.php');
-    var mime = uploadimage!.mimeType;
-    mime ??= 'png';
-    var response = await http
-        .post(url, body: {'image': baseimage, 'type': mime, 'email': email});
+    final fileName = uploadimage!.name;
+    final destination = 'files/$fileName';
+    File file = File(uploadimage!.path);
+    try {
+      final ref = firebase_storage.FirebaseStorage.instance.ref(destination);
+      print('object');
+      await ref.putFile(file);
+      var downUrl = await ref.getDownloadURL();
+      print(downUrl);
+      Uri url = Uri.http('192.168.1.3', '/wp/api/users/upload_image_url.php');
+      var response =
+          await http.post(url, body: {'img_url': downUrl, 'email': email});
+      if (response.statusCode == 200) {
+        var jsondata = json.decode(response.body); //decode json data
+        if (jsondata["error"]) {
+          //check error sent from server
+          showAlert(jsondata["msg"]);
 
-    if (response.statusCode == 200) {
-      var jsondata = json.decode(response.body); //decode json data
-      if (jsondata["error"]) {
-        //check error sent from server
-        showAlert(jsondata["msg"]);
-
-        //if error return from server, show message from server
-      } else {
-        context.read<AuthContext>().setUserImage(jsondata["img_url"]);
-        showAlert("Upload successful");
+          //if error return from server, show message from server
+        } else {
+          context.read<AuthContext>().setUserImage(jsondata["img_url"]);
+          showAlert("Upload successful");
+        }
       }
+    } catch (e) {
+      showAlert('error occured');
     }
+    // List<int> imageBytes = await uploadimage!.readAsBytes();
+    // String baseimage = base64Encode(imageBytes);
   }
 
   Future<void> pickImage() async {
@@ -85,7 +94,7 @@ class _ProfileState extends State<Profile> {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text('Image Updated'),
+          title: const Text('Image Upload'),
           content: const Text('Do You want to Upload this Image ?'),
           actions: <Widget>[
             TextButton(
@@ -173,11 +182,16 @@ class _ProfileState extends State<Profile> {
     final lnameContlr = TextEditingController();
     return Container(
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        const Padding(
-          padding: EdgeInsets.all(15),
-          child: Icon(
-            Icons.arrow_back,
-            size: 35,
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: const Icon(
+              Icons.arrow_back,
+              size: 35,
+            ),
           ),
         ),
         const Text(
@@ -289,8 +303,7 @@ class _ProfileState extends State<Profile> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         image: DecorationImage(
-            image: NetworkImage('http://192.168.1.3/wp/bucket/images/' +
-                context.watch<AuthContext>().user.photoUrl),
+            image: NetworkImage(context.watch<AuthContext>().user.photoUrl),
             fit: BoxFit.fill),
       ),
     );

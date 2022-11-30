@@ -89,10 +89,8 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(builder: (context) => const Profile()));
         },
         child: CircleAvatar(
-          backgroundImage: Image.network(
-                  'http://192.168.1.3/wp/bucket/images/' +
-                      context.watch<AuthContext>().user.photoUrl)
-              .image,
+          backgroundImage:
+              Image.network(context.watch<AuthContext>().user.photoUrl).image,
         ),
       );
     }

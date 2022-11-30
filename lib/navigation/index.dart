@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../context/auth_con.dart';
-import '../screens/sign_up.dart';
+// import '../screens/sign_up.dart';
 
 class Index extends StatefulWidget {
   const Index({Key? key}) : super(key: key);
@@ -19,7 +19,7 @@ class _IndexState extends State<Index> {
   @override
   void initState() {
     super.initState();
-    oAUthLogin();
+    // oAUthLogin();
   }
 
   void oAUthLogin() {
