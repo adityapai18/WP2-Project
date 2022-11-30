@@ -54,7 +54,35 @@ class _BookingState extends State<Booking> {
     return Container(
       padding: const EdgeInsets.all(15),
       child: Column(
-        children: [dateTimePicker(), dateWid(), button()],
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(5),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Icon(
+                    Icons.arrow_back,
+                    size: 35,
+                  ),
+                ),
+              ),
+              const Text(
+                "Booking",
+                style: TextStyle(fontSize: 32),
+              ),
+              Container(
+                width: 45,
+              )
+            ],
+          ),
+          dateTimePicker(),
+          dateWid(),
+          button()
+        ],
       ),
     );
   }
@@ -147,9 +175,9 @@ class _BookingState extends State<Booking> {
   }
 
   Widget button() {
-    if (timeList.length == 0) return Container();
+    if (timeList.isEmpty) return Container();
     return Container(
-      margin: EdgeInsets.only(top: 45),
+      margin: const EdgeInsets.only(top: 45),
       child: SizedBox(
           width: 150, // <-- Your width
           height: 40, // <-- Your height
@@ -157,7 +185,7 @@ class _BookingState extends State<Booking> {
             onPressed: () {
               bookAppointment();
             },
-            child: Text('Submit'),
+            child: const Text('Submit'),
           )),
     );
   }

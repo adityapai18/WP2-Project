@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:doctor_appointment/screens/item_details_page.dart';
 import 'package:doctor_appointment/screens/profile.dart';
@@ -20,6 +21,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedCategories = 'Surgeon';
   var docArray = [];
+  var latestAppointment;
+  var appointData = {'SPECIALITY': 'Surgeon', 'time': '1/12  10AM'};
   // String userName = '';
   // @override
   void getDocArray() async {
@@ -36,10 +39,43 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // void getAppointArray() async {
+  //   Uri url = Uri.http('192.168.1.3', 'wp/api/users/get_appointments.php');
+  //   var response = await http.get(url);
+  //   var msg = json.decode(response.body);
+  //   setState(() {
+  //     // This call to setState tells the Flutter framework that something has
+  //     // changed in this State, which causes it to rerun the build method below
+  //     // so that the display can reflect the updated values. If we changed
+  //     // _counter without calling setState(), then the build method would not be
+  //     // called again, and so nothing would appear to happen.
+  //     appArray = msg;
+  //   });
+  // }
+
+  void getLatestAppointment() async {
+    var uid = context.read<AuthContext>().user.uid;
+    Uri url = Uri.http('192.168.1.3', '/wp/api/users/get_appointments.php',
+        {'user_id': uid, 'latest': 'true'});
+    var response = await http.get(url);
+    var msg = json.decode(response.body);
+    if (msg.toString() != '[]') {
+      setState(() {
+        // This call to setState tells the Flutter framework that something has
+        // changed in this State, which causes it to rerun the build method below
+        // so that the display can reflect the updated values. If we changed
+        // _counter without calling setState(), then the build method would not be
+        // called again, and so nothing would appear to happen.
+        latestAppointment = msg;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getDocArray();
+    getLatestAppointment();
   }
 
   void setSelectedCat(String s) {
@@ -75,6 +111,7 @@ class _HomePageState extends State<HomePage> {
         ),
         buildGreetings(context),
         buildSearch(),
+        buildAppointments(),
         buildCategories(),
         buildDoctorsList()
       ],
@@ -217,6 +254,153 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget buildAppointments() {
+    String getDateAndTime(int time, String date) {
+      var res = '';
+      DateTime dateTime = DateTime.parse(date);
+      res += dateTime.day.toString() + '/' + dateTime.month.toString() + ' ';
+      if (time > 12) {
+        res += (time - 12).toString() + " PM";
+      } else {
+        res += (time).toString() + " AM";
+      }
+      return res;
+    }
+
+    if (latestAppointment != null) {
+      print(latestAppointment);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 20, top: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Upcoming Appointments",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: GoogleFonts.mulish().fontFamily,
+                      fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  child: Text(
+                    "See All",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontFamily: GoogleFonts.mulish().fontFamily,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 20, right: 10, top: 10),
+            width: window.physicalGeometry.width,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Constants.PRIMARY_COLOR),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        latestAppointment['doc_data']["SPECIALITY"]
+                                .toString()
+                                .toUpperCase() +
+                            '  CHECKUP',
+                        style: const TextStyle(
+                            color: Color.fromRGBO(255, 255, 255, 1),
+                            fontSize: 20),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        getDateAndTime(latestAppointment['apt_time'],
+                            latestAppointment['apt_date']),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontStyle: FontStyle.italic),
+                        textAlign: TextAlign.center,
+                      )
+                    ],
+                  ),
+                  doctorCard(
+                      'assets/dr_1.png',
+                      "Dr. " + latestAppointment['doc_data']["NAME"],
+                      latestAppointment['doc_data']["LOCATION"]!,
+                      '',
+                      '')
+                ],
+              ),
+            ),
+          )
+        ],
+      );
+    }
+    return Container();
+  }
+
+  Widget doctorCard(
+      String img, String name, String specialist, String rating, String time,
+      {bool isSelected = true}) {
+    return Container(
+      margin: const EdgeInsets.only(left: 10, top: 15, right: 20, bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            margin: const EdgeInsets.only(left: 5),
+            child: CircleAvatar(
+              backgroundImage: AssetImage(img),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 8),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: GoogleFonts.mulish().fontFamily,
+                        fontWeight: FontWeight.w800,
+                        color: isSelected ? Colors.white : Colors.black),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      specialist,
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: GoogleFonts.mulish().fontFamily,
+                          color: isSelected ? Colors.white : Colors.black),
+                    ),
+                  ),
+                ]),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget buildCategories() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,10 +439,10 @@ class _HomePageState extends State<HomePage> {
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             children: [
-              categoryTile("Surgeon", "assets/ic_surgeon.png",
-                  selectedCategories == 'Surgeon'),
-              categoryTile("Urologist", "assets/ic_kidney.png",
-                  selectedCategories == 'Urologist'),
+              categoryTile(
+                  "Gay", "assets/ic_surgeon.png", selectedCategories == 'Gay'),
+              categoryTile("Lesbian", "assets/ic_kidney.png",
+                  selectedCategories == 'Lesbian'),
               categoryTile("Dentist", "assets/ic_dentist.png",
                   selectedCategories == 'Dentist'),
               categoryTile("Allergist", "assets/ic_allergy.png",
@@ -314,23 +498,31 @@ class _HomePageState extends State<HomePage> {
   Widget buildDoctorsList() {
     List<Widget> list = [];
     for (var doc in docArray) {
-      print(doc);
-      list.add(doctorListTile(
-          "assets/dr_1.png",
-          doc['NAME'],
-          doc['SPECIALITY'],
-          "4.7",
-          "10.00 AM - 03.00 AM",
-          false,
-          doc['DESCRIPTION'],
-          doc['LOCATION'],
-          doc['UID'].toString()));
+      if (doc['SPECIALITY'].toString().toLowerCase() ==
+          selectedCategories.toLowerCase()) {
+        list.add(doctorListTile(
+            "assets/dr_1.png",
+            doc['NAME'],
+            doc['SPECIALITY'],
+            "4.7",
+            "10.00 AM - 03.00 PM",
+            false,
+            doc['DESCRIPTION'],
+            doc['LOCATION'],
+            doc['UID'].toString()));
+      }
     }
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      scrollDirection: Axis.vertical,
-      children: list,
+    return RefreshIndicator(
+      child: ListView(
+        shrinkWrap: true,
+        // physics: const NeverScrollableScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        children: list,
+      ),
+      onRefresh: () async {
+        getDocArray();
+      },
+      displacement: 10,
     );
   }
 

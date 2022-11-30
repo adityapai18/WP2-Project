@@ -19,7 +19,7 @@ class _IndexState extends State<Index> {
   @override
   void initState() {
     super.initState();
-    // oAUthLogin();
+    oAUthLogin();
   }
 
   void oAUthLogin() {
