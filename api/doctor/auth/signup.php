@@ -45,6 +45,8 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["name"])
                 $user_data = getUserData($dbh, $uid);
                 if ($isCreated !== false && $user_data !== false) {
                     $_SESSION['user_data'] = $user_data;
+                    $_SESSION['loginStatus'] = true;
+
                     header('Location: ../../../doc_end/home', true);
                 }
             }
