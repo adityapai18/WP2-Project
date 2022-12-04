@@ -14,15 +14,16 @@
 
 	<link rel="canonical" href="https://demo-basic.adminkit.io/" />
 
-	<title>AdminKit Demo - Bootstrap 5 Admin Template</title>
+	<title>Doctor Portal</title>
 
 	<link href="css/app.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <?php session_start();
-	if(!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))){
-		header('Location: ../../login/', true);
-	}
+if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
+	header('Location: ../../login/', true);
+}
+$user_data = $_SESSION['user_data'];
 ?>
 <?php
 function getDayBookingsByEmail(string $email, string $datePicked)
@@ -86,7 +87,7 @@ function isFuture($date)
 	$difference = floor($datediff / (60 * 60 * 24));
 	if ($difference > 1) {
 		return true;
-	} 
+	}
 	return $res;
 }
 ?>
@@ -244,7 +245,7 @@ function isFuture($date)
 							</a>
 
 							<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-								<img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="Charles Hall" /> <span class="text-dark"><?php echo $_SESSION['user_data']['NAME'] ?></span>
+								<img src="<?php echo isset($user_data['IMG_URL']) ? $user_data['IMG_URL'] : 'http://bootdey.com/img/Content/avatar/avatar1.png' ?>" class="avatar img-fluid rounded me-1" alt="Charles Hall" /> <span class="text-dark"><?php echo $_SESSION['user_data']['NAME'] ?></span>
 							</a>
 							<div class="dropdown-menu dropdown-menu-end">
 								<a class="dropdown-item" href="./profile.php"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
@@ -381,7 +382,11 @@ function isFuture($date)
 									<h5 class="card-title mb-0">Slot Details</h5>
 								</div>
 								<?php
-								if (isset($_POST['datePicked'])) $date = $_POST['datePicked'];
+								if (isset($_POST['datePicked'])) {
+									$date = $_POST['datePicked'];
+								} else {
+									$date = date("Y-m-d");
+								}
 								$doc_email = $_SESSION['user_data']['EMAIL'];
 								if (isset($date) && isset($doc_email)) {
 									$result = getDayBookingsByEmail($doc_email, $date);
@@ -492,7 +497,7 @@ function isFuture($date)
 													<td class="d-none d-xl-table-cell"><?php echo $value['user_data']['EMAIL'] ?></td>
 													<td class="d-none d-xl-table-cell"><?php echo $value['apt_date'] ?></td>
 													<td class="d-none d-md-table-cell"><?php echo $value['apt_time'] . ":00 - " . intval($value['apt_time']) + 1 . ":00"  ?></td>
-													<?php echo isFuture($value['apt_date']) ?  '<td><span class="badge bg-success">Completed</span></td>':'<td><span class="badge bg-warning">Upcoming</span></td>' ?>
+													<?php echo isFuture($value['apt_date']) ?  '<td><span class="badge bg-success">Completed</span></td>' : ($value['apt_time'] < date('h') ? '<td><span class="badge bg-warning">Upcoming</span></td>' : '<td><span class="badge bg-success">Completed</span></td>') ?>
 												</tr>
 										<?php
 											}
@@ -664,7 +669,7 @@ function isFuture($date)
 				prevArrow: "<span title=\"Previous month\">&laquo;</span>",
 				nextArrow: "<span title=\"Next month\">&raquo;</span>",
 				defaultDate: <?php if (isset($_POST['datePicked'])) echo json_encode($_POST['datePicked']);
-								else echo json_encode('2022-11-24') ?>,
+								else echo date("Y-m-d") ?>,
 				onChange: function(selectedDates, dateStr, instance) {
 					document.getElementById('dateInput').value = dateStr;
 					document.getElementById('dateForm').submit();

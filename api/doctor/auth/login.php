@@ -45,6 +45,7 @@ if (isset($_POST["email"]) && isset($_POST["pass"])) {
       // $result['message'] = "success";
       $_SESSION['loginStatus'] = true;
       $_SESSION["user_data"] = $user_data;
+      $_SESSION["user_data"]["IMG_URL"] = 'http://localhost/wp/bucket/images/'.$_SESSION["user_data"]["IMG_URL"];
       header('Location: ../../../doc_end/home/static', true);
 
     } else {

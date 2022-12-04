@@ -49,7 +49,9 @@ function getBookingArray(\PDO $dbh, string $id)
     $res = $stmt->fetch();
     return json_decode($res['BOOKING'], true);
 }
+function sendMailToPatient(){
 
+}
 function updateInDocDB(\PDO $dbh, string $id, string $bookingData)
 {
     $update = "UPDATE doc_data SET BOOKING = :bk_data WHERE UID = :id;";

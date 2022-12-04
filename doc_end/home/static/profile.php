@@ -18,6 +18,8 @@
 	<style>
 		.img-account-profile {
 			height: 10rem;
+			width: 10rem;
+			border-radius: 10rem;
 		}
 
 		.rounded-circle {
@@ -70,7 +72,6 @@ if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
 	header('Location: ../../login/', true);
 } else {
 	$user_data = $_SESSION['user_data'];
-	// print_r($user_data);
 }
 ?>
 
@@ -78,7 +79,7 @@ if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
 	<div class="wrapper">
 		<div class="main">
 			<nav class="navbar navbar-expand navbar-light navbar-bg">
-				<h1 class="p-0 m-0">MyDoctor</h1>
+				<h1 class="p-0 m-0"><a href="./index.php">MyDoctor</a></h1>
 				<div class="navbar-collapse collapse">
 					<ul class="navbar-nav navbar-align">
 						<li class="nav-item dropdown">
@@ -224,13 +225,12 @@ if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
 							<a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
 								<i class="align-middle" data-feather="settings"></i>
 							</a>
-
 							<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-								<img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="Charles Hall" /> <span class="text-dark">Charles Hall</span>
+								<img class="avatar img-fluid rounded me-1" src="<?php echo isset($user_data['IMG_URL']) ? $user_data['IMG_URL'] : 'http://bootdey.com/img/Content/avatar/avatar1.png' ?>" alt=""><span class="text-dark"><?php echo $_SESSION['user_data']['NAME'] ?></span>
 							</a>
 							<div class="dropdown-menu dropdown-menu-end">
-								<a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
-								<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="pie-chart"></i> Analytics</a>
+								<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="user"></i> Profile</a>
+								<a class="dropdown-item" href="./index.php"><i class="align-middle me-1" data-feather="pie-chart"></i> Analytics</a>
 								<div class="dropdown-divider"></div>
 								<a class="dropdown-item" href="index.html"><i class="align-middle me-1" data-feather="settings"></i> Settings & Privacy</a>
 								<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="help-circle"></i> Help Center</a>
@@ -254,12 +254,34 @@ if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
 								<div class="card-header">Profile Picture</div>
 								<div class="card-body text-center">
 									<!-- Profile picture image-->
-									<img class="img-account-profile rounded-circle mb-2" src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="">
+									<img class="img-account-profile mb-2" height="100" width="100" src="<?php echo isset($user_data['IMG_URL']) ? $user_data['IMG_URL'] : 'http://bootdey.com/img/Content/avatar/avatar1.png' ?>" alt="">
 									<!-- Profile picture help block-->
 									<div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
 									<!-- Profile picture upload button-->
-									<input id="fileInput" type="file" style="display: none;">
-									<button onclick="document.getElementById('fileInput').click()" class="btn btn-primary" type="button">Upload new image</button>
+									<form action="../../../api/doctor/upload_image.php" method="post" id="fileForm">
+										<input id="fileInput" type="file" accept="image/*" style="display: none;" oninput="submitForm()">
+										<input type="hidden" name="email" value="<?php echo $user_data['EMAIL'] ?>">
+										<input type="hidden" name="image" id="imageFile">
+										<input type="hidden" name="type" value="" id="fileType">
+										<button onclick="document.getElementById('fileInput').click()" class="btn btn-primary" type="button">Upload new image</button>
+										<script>
+											const toBase64 = file => new Promise((resolve, reject) => {
+												const reader = new FileReader();
+												reader.readAsDataURL(file);
+												reader.onload = () => resolve(reader.result);
+												reader.onerror = error => reject(error);
+											});
+											const submitForm = async () => {
+												var fileName = document.getElementById('fileInput').value;
+												var file = document.getElementById('fileInput').files[0];
+												extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+												document.getElementById('fileType').value = extension;
+												var baseUrl = await toBase64(file);
+												document.getElementById('imageFile').value = baseUrl.split(',')[1];
+												document.getElementById('fileForm').submit();
+											}
+										</script>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -268,34 +290,53 @@ if (!(isset($_SESSION['loginStatus']) && isset($_SESSION['user_data']))) {
 							<div class="card mb-4">
 								<div class="card-header">Account Details</div>
 								<div class="card-body">
-									<form>
+									<form action="../../../api/doctor/update_doc_details.php" method="post">
 										<!-- Form Group (username)-->
 										<div class="mb-3">
 											<label class="small mb-1" for="inputUsername">Username (how your name will appear to other users on the site)</label>
-											<input class="form-control" id="inputUsername" type="text" placeholder="Enter your username" value="username">
+											<input class="form-control" id="inputUsername" name="uname" type="text" placeholder="Enter your username" value="<?php echo $user_data['NAME'] ?>">
 										</div>
 										<!-- Form Row        -->
 										<div class="row gx-3 mb-3">
 											<!-- Form Group (organization name)-->
-											<div class="col-md-6">
-												<label class="small mb-1" for="inputOrgName">Speciality</label>
-												<input class="form-control" id="inputOrgName" type="text" placeholder="Enter your organization name" value="<?php echo $user_data['SPECIALITY'] ?>">
+											<div class="col-md-6 h-full d-flex align-items-center">
+												<label class="small" for="inputOrgName">Speciality</label>
+												<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+													<span class="text-dark" id="specialitySpan"><?php echo $_SESSION['user_data']['SPECIALITY'] ?></span>
+												</a>
+												<input type="hidden" name="speciality" id="specialityInp" value="<?php echo $_SESSION['user_data']['SPECIALITY'] ?>">
+												<div class="dropdown-menu dropdown-menu-end border">
+													<a onclick="setSelected('Surgeon')" class="dropdown-item">Surgeon</a>
+													<a onclick="setSelected('Dentist')" class="dropdown-item"> Dentist</a>
+													<a onclick="setSelected('Kidney')" class="dropdown-item">Kidney</a>
+													<a onclick="setSelected('Allergist')" class="dropdown-item">Allergist</a>
+												</div>
+												<script>
+													function setSelected(sel) {
+														document.getElementById('specialitySpan').innerHTML=sel;
+														document.getElementById('specialityInp').value=sel;
+													}
+												</script>
 											</div>
 											<!-- Form Group (location)-->
 											<div class="col-md-6">
 												<label class="small mb-1" for="inputLocation">Location</label>
-												<input class="form-control" id="inputLocation" type="text" placeholder="Enter your location" value="<?php echo $user_data['LOCATION'] ?>">
+												<input class="form-control" id="inputLocation" name="loc" type="text" placeholder="Enter your location" value="<?php echo $user_data['LOCATION'] ?>">
 											</div>
 										</div>
 										<!-- Form Group (email address)-->
 										<div class="mb-3">
 											<label class="small mb-1" for="inputEmailAddress">Email address</label>
-											<input class="form-control" id="inputEmailAddress" type="email" placeholder="Enter your email address" value="<?php echo $user_data['EMAIL'] ?>">
+											<input readonly class="form-control" id="inputEmailAddress" name="email" type="email" placeholder="Enter your email address" value="<?php echo $user_data['EMAIL'] ?>">
+										</div>
+										<div class="mb-3">
+											<label class="small mb-1" for="inputEmailAddress">Description</label>
+											<input class="form-control" id="inputEmailAddress" name="desc"  type="text" placeholder="Enter your email address" value="<?php echo $user_data['DESCRIPTION'] ?>">
 										</div>
 										<!-- Form Row-->
 
 										<!-- Save changes button-->
-										<button class="btn btn-primary" type="button">Save changes</button>
+										<input  class="btn btn-primary" type="submit"></input>
 									</form>
 								</div>
 							</div>
