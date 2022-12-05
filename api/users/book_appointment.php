@@ -1,5 +1,6 @@
 <?php
 include '../users/auth/dbConfig.php';
+include './mailingSys/index.php';
 try {
     $dbh = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -17,10 +18,20 @@ if (isset($doc_id) && isset($bk_date) && isset($bk_time)) {
     if (isset($bookingArr[$bk_date][$bk_time])) {
         if (!$bookingArr[$bk_date][$bk_time]) {
             $bookingArr[$bk_date][$bk_time] = true;
-            if (updateInDocDB($dbh, $doc_id, json_encode($bookingArr)) && putInBookingTable($dbh, 
-            $user_id, $doc_id, $bk_date, $bk_time)) {
-                $result['booking_status'] = true;
-                $result['message'] = "booking successfull";
+            if (updateInDocDB($dbh, $doc_id, json_encode($bookingArr)) && putInBookingTable(
+                $dbh,
+                $user_id,
+                $doc_id,
+                $bk_date,
+                $bk_time
+            )) {
+                if (sendMailToPatient($dbh ,$doc_id, $user_id, $bk_date, $bk_time)) {
+                    $result['booking_status'] = true;
+                    $result['message'] = "booking successfull";
+                } else {
+                    $result['booking_status'] = false;
+                    $result['message'] = "error";
+                }
             } else {
                 $result['booking_status'] = false;
                 $result['message'] = "error";
@@ -48,9 +59,6 @@ function getBookingArray(\PDO $dbh, string $id)
     $stmt->setFetchMode(PDO::FETCH_ASSOC);
     $res = $stmt->fetch();
     return json_decode($res['BOOKING'], true);
-}
-function sendMailToPatient(){
-
 }
 function updateInDocDB(\PDO $dbh, string $id, string $bookingData)
 {
