@@ -81,7 +81,7 @@ function getUserDetails(string $uid, \PDO $dbh)
 function isFuture($date)
 {
 	$current = strtotime(date("Y-m-d"));
-	$date    = strtotime("2014-09-05");
+	$date    = strtotime($date);
 	$res = false;
 	$datediff = $date - $current;
 	$difference = floor($datediff / (60 * 60 * 24));
@@ -497,7 +497,7 @@ function isFuture($date)
 													<td class="d-none d-xl-table-cell"><?php echo $value['user_data']['EMAIL'] ?></td>
 													<td class="d-none d-xl-table-cell"><?php echo $value['apt_date'] ?></td>
 													<td class="d-none d-md-table-cell"><?php echo $value['apt_time'] . ":00 - " . intval($value['apt_time']) + 1 . ":00"  ?></td>
-													<?php echo isFuture($value['apt_date']) ?  '<td><span class="badge bg-success">Completed</span></td>' : ($value['apt_time'] < date('h') ? '<td><span class="badge bg-warning">Upcoming</span></td>' : '<td><span class="badge bg-success">Completed</span></td>') ?>
+													<?php echo isFuture($value['apt_date']) ? '<td><span class="badge bg-warning">Upcoming</span></td>' :'<td><span class="badge bg-success">Completed</span></td>' ?>
 												</tr>
 										<?php
 											}

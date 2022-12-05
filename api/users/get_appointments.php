@@ -16,7 +16,17 @@ function dateCheck($var)
     }
     return $var;
 }
-
+function isFuture($date)
+{
+    $current = strtotime(date("Y-m-d"));
+    $date    = strtotime($date);
+    $datediff = $date - $current;
+    $difference = floor($datediff / (60 * 60 * 24));
+    if ($difference > 1) {
+        return true;
+    }
+    return false;
+}
 function getDocData(\PDO $dbh, string $id)
 {
     $sql = "SELECT * FROM doc_data WHERE UID=:id;";
@@ -52,8 +62,21 @@ function getBookingArray(\PDO $dbh, string $id)
 
 if (isset($_GET['user_id'])) {
     $result = getBookingArray($dbh, $_GET['user_id']);
-    if (isset($_GET['latest']) && $_GET['latest'] && count($result)>0)
+    if (isset($_GET['latest']) && $_GET['latest'] && count($result) > 0)
         $result = $result[0];
+    else if (isset($_GET['all'])) {
+        $newArr = [];
+        $newArr['upcoming'] = [];
+        $newArr['past'] = [];
+        foreach ($result as $key => $value) {
+            if (isFuture($value['apt_date'])) {
+                array_push($newArr['upcoming'], $value);
+            } else {
+                array_push($newArr['past'], $value);
+            }
+        }
+        $result = $newArr;
+    }
 }
 
 echo json_encode($result);
