@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:doctor_appointment/constants/constants.dart';
 import 'package:doctor_appointment/screens/appointments.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   String email = '';
+  var isPrivate = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -60,10 +62,8 @@ class _ProfileState extends State<Profile> {
     File file = File(uploadimage!.path);
     try {
       final ref = firebase_storage.FirebaseStorage.instance.ref(destination);
-      print('object');
       await ref.putFile(file);
       var downUrl = await ref.getDownloadURL();
-      print(downUrl);
       Uri url = Uri.http('192.168.1.3', '/wp/api/users/upload_image_url.php');
       var response =
           await http.post(url, body: {'img_url': downUrl, 'email': email});
@@ -172,7 +172,7 @@ class _ProfileState extends State<Profile> {
             Container(
               child: optionsWid(),
               margin: const EdgeInsets.only(top: 35),
-            )
+            ),
           ],
         ));
   }
@@ -324,7 +324,8 @@ class _ProfileState extends State<Profile> {
       children: [
         optionTab("Your History", Icons.history),
         optionTab("Terms & Conditions", Icons.file_copy),
-        optionTab("Logout", Icons.exit_to_app)
+        optionTab("Logout", Icons.exit_to_app),
+        mySwitch()
       ],
     );
   }
@@ -361,6 +362,70 @@ class _ProfileState extends State<Profile> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget mySwitch() {
+    final MaterialStateProperty<Color?> trackColor =
+        MaterialStateProperty.resolveWith<Color?>(
+      (Set<MaterialState> states) {
+        // Track color when the switch is selected.
+        if (states.contains(MaterialState.selected)) {
+          return Constants.PRIMARY_COLOR;
+        }
+        // Otherwise return null to set default track color
+        // for remaining states such as when the switch is
+        // hovered, focused, or disabled.
+        return null;
+      },
+    );
+    final MaterialStateProperty<Color?> overlayColor =
+        MaterialStateProperty.resolveWith<Color?>(
+      (Set<MaterialState> states) {
+        // Material color when switch is selected.
+        if (states.contains(MaterialState.selected)) {
+          return Colors.amber.withOpacity(0.54);
+        }
+        // Material color when switch is disabled.
+        if (states.contains(MaterialState.disabled)) {
+          return Colors.grey.shade400;
+        }
+        // Otherwise return null to set default material color
+        // for remaining states such as when the switch is
+        // hovered, or focused.
+        return null;
+      },
+    );
+
+    return Container(
+      padding: const EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(top: 15),
+      decoration: const BoxDecoration(
+          border: Border(
+              bottom: BorderSide(color: Color.fromARGB(185, 204, 204, 204)))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 15),
+            child: const Text(
+              'Manage Privacy',
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          Switch(
+            // This bool value toggles the switch.
+            value: context.watch<AuthContext>().user.isPrivate,
+            overlayColor: overlayColor,
+            trackColor: trackColor,
+            thumbColor: MaterialStateProperty.all<Color>(Colors.black),
+            onChanged: (bool value) {
+              // This is called when the user toggles the switch.
+              context.read<AuthContext>().setAndUpdatePrivacy(value);
+            },
+          )
+        ],
       ),
     );
   }

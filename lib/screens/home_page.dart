@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:doctor_appointment/screens/appointments.dart';
 import 'package:doctor_appointment/screens/item_details_page.dart';
 import 'package:doctor_appointment/screens/profile.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,7 @@ class _HomePageState extends State<HomePage> {
   var docArray = [];
   var latestAppointment;
   var appointData = {'SPECIALITY': 'Surgeon', 'time': '1/12  10AM'};
-  // String userName = '';
-  // @override
+
   void getDocArray() async {
     Uri url = Uri.http('192.168.1.3', 'wp/api/users/get_doctors.php');
     var response = await http.get(url);
@@ -286,12 +286,20 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(right: 20),
-                  child: Text(
-                    "See All",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                      fontFamily: GoogleFonts.mulish().fontFamily,
+                  child: InkWell(
+                    onTap: (() {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Appointments()));
+                    }),
+                    child: Text(
+                      "See All",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontFamily: GoogleFonts.mulish().fontFamily,
+                      ),
                     ),
                   ),
                 ),
@@ -337,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   doctorCard(
-                      'assets/dr_1.png',
+                      latestAppointment['doc_data']["IMG_URL"],
                       "Dr. " + latestAppointment['doc_data']["NAME"],
                       latestAppointment['doc_data']["LOCATION"]!,
                       '',
@@ -366,7 +374,7 @@ class _HomePageState extends State<HomePage> {
             height: 60,
             margin: const EdgeInsets.only(left: 5),
             child: CircleAvatar(
-              backgroundImage: AssetImage(img),
+              backgroundImage: NetworkImage(img),
             ),
           ),
           Container(
@@ -500,7 +508,7 @@ class _HomePageState extends State<HomePage> {
       if (doc['SPECIALITY'].toString().toLowerCase() ==
           selectedCategories.toLowerCase()) {
         list.add(doctorListTile(
-            "assets/dr_1.png",
+            doc['IMG_URL']!,
             doc['NAME'],
             doc['SPECIALITY'],
             "4.7",
@@ -567,7 +575,7 @@ class _HomePageState extends State<HomePage> {
               height: 70,
               margin: const EdgeInsets.only(left: 5),
               child: CircleAvatar(
-                backgroundImage: AssetImage(img),
+                backgroundImage: NetworkImage(img),
               ),
             ),
             Container(

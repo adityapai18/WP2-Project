@@ -18,6 +18,12 @@ class User {
   String _photoUrl = '';
   String _uid = '';
 
+  bool _isPrivate = false;
+  bool get isPrivate => _isPrivate;
+  set setPrivacy(bool privacy) {
+    _isPrivate = privacy;
+  }
+
   String get name => _name;
 
   set setName(String name) {
@@ -47,7 +53,6 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
   bool _authState = false;
   User user = User();
   bool get authState => _authState;
-
   void setAuthorized() {
     _authState = true;
     notifyListeners();
@@ -64,7 +69,19 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
     user.setEmail = userData["EMAIL"];
     user.setphotoUrl = userData["IMG_URL"];
     user.setUid = userData["UID"].toString();
+    user.setPrivacy = userData["isPrivate"] == 1 ? true : false;
     notifyListeners();
+  }
+
+  void setAndUpdatePrivacy(bool val) async {
+    Uri url = Uri.http(
+        '192.168.1.3', 'wp/api/users/make_private.php', {'user_id': user._uid});
+    var response = await http.get(url);
+    var msg = json.decode(response.body);
+    if (msg['updated']) {
+      user.setPrivacy = val;
+      notifyListeners();
+    }
   }
 
   void setUserImage(String img) {
@@ -85,7 +102,7 @@ class AuthContext with ChangeNotifier, DiagnosticableTreeMixin {
   }
 
   void updateUserName(String fname, String lname, String email) async {
-    Uri url = Uri.http('192.168.1.3168.245.236', '/wp/api/users/update_name.php');
+    Uri url = Uri.http('192.168.1.3', '/wp/api/users/update_name.php');
     var data = {'name': fname + ' ' + lname, 'email': email};
     var response = await http.post(url, body: data);
     print(response);
