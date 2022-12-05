@@ -47,7 +47,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["name"])
                     $_SESSION['user_data'] = $user_data;
                     $_SESSION['loginStatus'] = true;
 
-                    header('Location: ../../../doc_end/home', true);
+                    header('Location: ../../../doc_end/home/static', true);
                 }
             }
             // $res['len']=strlen(bin2hex($key));

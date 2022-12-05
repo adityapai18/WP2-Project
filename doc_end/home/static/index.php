@@ -70,7 +70,7 @@ function getAppointmentDetails(string $uid)
 }
 function getUserDetails(string $uid, \PDO $dbh)
 {
-	$sql = "SELECT NAME , EMAIL FROM user_data WHERE UID = :id ;";
+	$sql = "SELECT NAME , EMAIL , isPrivate FROM user_data WHERE UID = :id ;";
 	$stmt =  $dbh->prepare($sql);
 	$stmt->bindParam(':id', $uid);
 	$stmt->execute();
@@ -254,7 +254,7 @@ function isFuture($date)
 								<a class="dropdown-item" href="index.html"><i class="align-middle me-1" data-feather="settings"></i> Settings & Privacy</a>
 								<a class="dropdown-item" href="#"><i class="align-middle me-1" data-feather="help-circle"></i> Help Center</a>
 								<div class="dropdown-divider"></div>
-								<a class="dropdown-item" href="#">Log out</a>
+								<a class="dropdown-item" href="/wp/api/doctor/auth/logout.php">Log out</a>
 							</div>
 						</li>
 					</ul>
@@ -490,14 +490,48 @@ function isFuture($date)
 										<?php
 										if (isset($_SESSION['user_data'])) {
 											$appArray = getAppointmentDetails($_SESSION['user_data']["UID"]);
+											function hideEmailAddress($email)
+											{
+												if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+													list($first, $last) = explode('@', $email);
+													$first = str_replace(substr($first, '3'), str_repeat('*', strlen($first) - 3), $first);
+													$last = explode('.', $last);
+													$last_domain = str_replace(substr($last['0'], '1'), str_repeat('*', strlen($last['0']) - 1), $last['0']);
+													$hideEmailAddress = $first . '@' . $last_domain . '.' . $last['1'];
+													return $hideEmailAddress;
+												}
+											}
+											function hideName($name)
+											{
+												$name_fragments = explode(" ", $name);
+
+												// Loop over "John" and "Doe"
+												$result = "";
+												foreach ($name_fragments as $fragment) {
+													if (strlen($result) !== 0) {
+														$result .= " ";
+													}
+
+													// Add clear first letter
+													$result .= $fragment[0];
+
+													// Add asterisks
+													$result .= str_repeat("*", strlen($fragment) - 1);
+												}
+												return $result;
+											}
 											foreach ($appArray as $key => $value) {
+												if ($value['user_data']['isPrivate']) {
+													$value['user_data']['EMAIL'] = hideEmailAddress($value['user_data']['EMAIL']);
+													$value['user_data']['NAME'] = hideName($value['user_data']['NAME']);
+												}
 										?>
 												<tr>
 													<td><?php echo $value['user_data']['NAME'] ?></td>
 													<td class="d-none d-xl-table-cell"><?php echo $value['user_data']['EMAIL'] ?></td>
 													<td class="d-none d-xl-table-cell"><?php echo $value['apt_date'] ?></td>
 													<td class="d-none d-md-table-cell"><?php echo $value['apt_time'] . ":00 - " . intval($value['apt_time']) + 1 . ":00"  ?></td>
-													<?php echo isFuture($value['apt_date']) ? '<td><span class="badge bg-warning">Upcoming</span></td>' :'<td><span class="badge bg-success">Completed</span></td>' ?>
+													<?php echo isFuture($value['apt_date']) ? '<td><span class="badge bg-warning">Upcoming</span></td>' : '<td><span class="badge bg-success">Completed</span></td>' ?>
 												</tr>
 										<?php
 											}

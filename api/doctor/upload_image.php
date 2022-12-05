@@ -36,7 +36,7 @@ if (isset($_POST["image"])) {
 
     // clean up the file resource
     fclose($filehandler);
-    if (updateFileForEmail($dbh,$_POST["email"],basename($outputfile))) {
+    if (updateFileForEmail($dbh,$_POST["email"],"http://192.168.1.3/wp/bucket/images/".basename($outputfile))) {
         // $result["error"] = false;
         // $result["msg"] =  "Image Uploaded";
         $_SESSION['user_data']["IMG_URL"]= "http://localhost/wp/bucket/images/".basename($outputfile);
