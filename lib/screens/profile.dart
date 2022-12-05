@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:doctor_appointment/screens/appointments.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -333,6 +334,10 @@ class _ProfileState extends State<Profile> {
       onTap: () {
         if (opt == "Logout") {
           context.read<AuthContext>().logOut(context);
+        }
+        if (opt == "Your History") {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Appointments()));
         }
       },
       child: Container(

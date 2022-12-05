@@ -268,7 +268,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (latestAppointment != null) {
-      print(latestAppointment);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -439,10 +438,10 @@ class _HomePageState extends State<HomePage> {
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             children: [
-              categoryTile(
-                  "Gay", "assets/ic_surgeon.png", selectedCategories == 'Gay'),
-              categoryTile("Lesbian", "assets/ic_kidney.png",
-                  selectedCategories == 'Lesbian'),
+              categoryTile("Surgeon", "assets/ic_surgeon.png",
+                  selectedCategories == 'Surgeon'),
+              categoryTile("Kidney", "assets/ic_kidney.png",
+                  selectedCategories == 'Kidney'),
               categoryTile("Dentist", "assets/ic_dentist.png",
                   selectedCategories == 'Dentist'),
               categoryTile("Allergist", "assets/ic_allergy.png",
